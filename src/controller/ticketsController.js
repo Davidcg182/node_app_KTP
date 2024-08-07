@@ -25,7 +25,7 @@ const getTickets = async (req, res) => {
         allTikets = await Promise.all(allTikets.map(async ticket => {
             const userId = ticket.userId
             const user = await users.findOne({ where: { id: userId } });
-            return { ...ticket.toJSON(), user: { name: user.name, email: user.email } }
+            return { ...ticket.toJSON(), user: user }
         }))
 
         const total = await tickets.count()
@@ -115,10 +115,14 @@ const updateTicket = async (req, res) => {
 
         const updated = await ticket.save();
 
+        const user = await users.findByPk(updated.userId);
+
+        const response = { ...updated.dataValues, user: user }
+
         return res.status(200).json({
             status: 'success',
             message: `updated ticket ${id}`,
-            data: updated
+            data: response
         });
 
     } catch (error) {
