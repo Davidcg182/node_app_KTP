@@ -7,7 +7,4 @@ router.post('/signup', signup)
 router.post('/login', login)
 router.get('/authentication', authentication, restrictTo('0'))
 
-
-
-
 export default router

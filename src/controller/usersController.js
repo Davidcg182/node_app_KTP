@@ -22,9 +22,12 @@ const getUsers = async (req, res) => {
             limit: limit
         })
 
+        const total = await users.count()
+
         res.status(200).json({
             status: 'success',
-            data: allUsers
+            data: allUsers,
+            total: total
         });
     } catch (error) {
         res.status(500).send({ error: error })
@@ -45,7 +48,7 @@ const deleteUser = async (req, res) => {
         await user.destroy();
         res.status(200).json({
             status: 'success',
-            mensaje: 'user deleted'
+            mensaje: 'user deleted',
         });
     } catch (error) {
         res.status(500).send({ error: error.message });
@@ -80,11 +83,12 @@ const updateUser = async (req, res) => {
         user.salary = salary ? salary : user.salary;
         user.userType = userType ? userType : user.userType
 
-        await user.save();
+        const updateUser = await user.save();
 
         return res.status(200).json({
             status: 'success',
-            message: `updated user ${id}`
+            message: `updated user ${id}`,
+            data: updateUser
         });
 
     } catch (error) {

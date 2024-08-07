@@ -28,9 +28,12 @@ const getTickets = async (req, res) => {
             return { ...ticket.toJSON(), user: { name: user.name, email: user.email } }
         }))
 
+        const total = await tickets.count()
+
         res.status(200).json({
             status: 'success',
-            data: allTikets
+            data: allTikets,
+            total: total
         });
     } catch (error) {
         res.status(500).send({ error: error })
@@ -110,11 +113,12 @@ const updateTicket = async (req, res) => {
         ticket.description = description ? description : ticket.description;
         ticket.summary = summary ? summary : ticket.summary;
 
-        await ticket.save();
+        const updated = await ticket.save();
 
         return res.status(200).json({
             status: 'success',
-            message: `updated ticket ${id}`
+            message: `updated ticket ${id}`,
+            data: updated
         });
 
     } catch (error) {

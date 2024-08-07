@@ -18,5 +18,4 @@ app.use('/auth', authRoute);
 app.use('/tickets', ticketsRoute);
 app.use('/users', usersRoute);
 
-
 export default app;

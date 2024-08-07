@@ -13,7 +13,7 @@ const generateToken = (payload) => {
     })
 }
 
-const signup = async (req, res, next) => {
+const signup = async (req, res) => {
 
     const { name, email, userType, password, confirmPassword } = req.body;
 
@@ -48,8 +48,6 @@ const signup = async (req, res, next) => {
             id: result.id
         })
 
-        console.log(result)
-
         res.status(201).json({
             status: 'success',
             data: result
@@ -61,7 +59,7 @@ const signup = async (req, res, next) => {
 
 };
 
-const login = async (req, res, next) => {
+const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -140,7 +138,7 @@ const restrictTo = (...userType) => {
         if (!userType.includes(req.user.userType)) {
             return res.status(400).json({
                 status: 'fail',
-                message: 'no tienes permisos'
+                message: 'auth required'
             })
         }
 
