@@ -59,9 +59,13 @@ const createTicket = async (req, res) => {
             userId: userId
         });
 
+        const user = await users.findByPk(userId);
+
+        const response = { ...newTicket.dataValues, user: user }
+
         return res.status(200).json({
             status: 'success',
-            data: newTicket
+            data: response
         });
     } catch (error) {
         res.status(500).send({ error: error.message });
