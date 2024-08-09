@@ -1,38 +1,67 @@
 import users from '../db/models/users.js'
-
+import { Op } from "sequelize";
 
 const getUsers = async (req, res) => {
     try {
 
-        let limit = 9
-        let offSet = 0
+        if (req.user.userType === '1') {
 
-        const { page, results_per_page } = req.query
+            const userSQ = await users.findByPk(req.user.id);
+            const user = userSQ.toJSON()
+            delete user.password
+            return res.status(200).json({
+                status: 'success',
+                data: [user],
+                total: "1"
+            });
+        }
+
+        let limit = 9;
+        let offSet = 0;
+
+        const { page, results_per_page, search } = req.query;
 
         if (results_per_page) {
-            limit = results_per_page
+            limit = parseInt(results_per_page);
         }
 
         if (page) {
-            offSet = (page - 1) * limit
+            offSet = (page - 1) * limit;
         }
 
-        let allUsers = await users.findAll({
+        let filter = {};
+        if (search) {
+            filter = {
+                where: {
+                    [Op.or]: [
+                        { name: { [Op.iLike]: `%${search}%` } },
+                        { email: { [Op.iLike]: `%${search}%` } }
+                    ]
+                }
+            };
+        }
+
+
+        const totalFiltered = await users.count(filter);
+
+        const allUsers = await users.findAll({
+            ...filter,
             offset: offSet,
-            limit: limit
-        })
+            limit: limit,
+            attributes: { exclude: ['password'] }
+        });
 
-        const total = await users.count()
-
-        res.status(200).json({
+        return res.status(200).json({
             status: 'success',
             data: allUsers,
-            total: total
+            total: totalFiltered
         });
     } catch (error) {
-        res.status(500).send({ error: error })
+        res.status(500).send({ error: error.message });
     }
 };
+
+
 
 
 const deleteUser = async (req, res) => {
@@ -83,7 +112,10 @@ const updateUser = async (req, res) => {
         user.salary = salary ? salary : user.salary;
         user.userType = userType ? userType : user.userType
 
-        const updateUser = await user.save();
+        const updateUserSQ = await user.save();
+        const updateUser = updateUserSQ.toJSON()
+        delete updateUser.password
+
 
         return res.status(200).json({
             status: 'success',

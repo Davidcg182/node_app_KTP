@@ -1,44 +1,69 @@
-import users from '../db/models/users.js'
-import tickets from '../db/models/tickets.js'
+import tickets from '../db/models/tickets.js';
+import users from '../db/models/users.js';
+import { Op } from "sequelize";
 
 const getTickets = async (req, res) => {
     try {
+        let limit = 9;
+        let offSet = 0;
 
-        let limit = 9
-        let offSet = 0
-
-        const { page, results_per_page } = req.query
+        const { page, results_per_page, search } = req.query;
 
         if (results_per_page) {
-            limit = results_per_page
+            limit = parseInt(results_per_page);
         }
 
         if (page) {
-            offSet = (page - 1) * limit
+            offSet = (page - 1) * limit;
         }
 
+        let filter = {};
+
+        if (req.user.userType === '1') {
+            filter = {
+                where: {
+                    userId: req.user.id
+                }
+            };
+        }
+
+        if (search) {
+            filter.where = {
+                ...filter.where,
+                [Op.or]: [
+                    { code: { [Op.iLike]: `%${search}%` } },
+                    { description: { [Op.iLike]: `%${search}%` } },
+                    { summary: { [Op.iLike]: `%${search}%` } }
+                ]
+            };
+        }
+
+        const totalFiltered = await tickets.count(filter);
+
         let allTikets = await tickets.findAll({
+            ...filter,
             offset: offSet,
             limit: limit
-        })
+        });
 
         allTikets = await Promise.all(allTikets.map(async ticket => {
-            const userId = ticket.userId
-            const user = await users.findOne({ where: { id: userId } });
-            return { ...ticket.toJSON(), user: user }
-        }))
+            const userId = ticket.userId;
+            const userSQ = await users.findOne({ where: { id: userId } });
+            const user = userSQ.toJSON()
+            delete user.password
+            return { ...ticket.toJSON(), user: user };
+        }));
 
-        const total = await tickets.count()
-
-        res.status(200).json({
+        return res.status(200).json({
             status: 'success',
             data: allTikets,
-            total: total
+            total: totalFiltered
         });
     } catch (error) {
-        res.status(500).send({ error: error })
+        res.status(500).send({ error: error.message });
     }
 };
+
 
 
 const createTicket = async (req, res) => {
@@ -59,7 +84,9 @@ const createTicket = async (req, res) => {
             userId: userId
         });
 
-        const user = await users.findByPk(userId);
+        const userSQ = await users.findByPk(userId);
+        const user = userSQ.toJSON()
+        delete user.password
 
         const response = { ...newTicket.dataValues, user: user }
 
@@ -119,7 +146,9 @@ const updateTicket = async (req, res) => {
 
         const updated = await ticket.save();
 
-        const user = await users.findByPk(updated.userId);
+        const userSQ = await users.findByPk(updated.userId);
+        const user = userSQ.toJSON()
+        delete user.password
 
         const response = { ...updated.dataValues, user: user }
 
