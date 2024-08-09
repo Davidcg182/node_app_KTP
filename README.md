@@ -38,8 +38,8 @@ TOMAR EL TOKEN DE AUTENTICACIÓN DEL LOGIN O DEL SIGNUP
 
 Tickets: (TODAS LAS RUTAS SIGUIENTES DEBEN ENTREGAR EL TOKEN DE AUTENTICACIÓN POR HEADERS COMO BARRER TOKEN)
 
-http://localhost:9000/tikects?page="X"&&results_per_page="Y"
---> Solicitud de tipo GET, entrega todos los tickets, se pueden pasar por query params los valores "X" y "Y" para indicar página y total de resultados por página
+http://localhost:9000/tikects?page="X"&&results_per_page="Y"&&search="Z"
+--> Solicitud de tipo GET, entrega todos los tickets, se pueden pasar por query params los valores "X" y "Y" para indicar página y total de resultados por página; y el valor "Z" para filtrar los resultados
 
 http://localhost:9000/tikects/newticket
 --> Solicitud tipo POST, recibe por body {
@@ -58,11 +58,14 @@ http://localhost:9000/tikects/update/:id
 
 Usuarios:
 
-http://localhost:9000/users?page="X"&&results_per_page="Y"
---> Solicitud de tipo get, entrega todos los usuarios, se pueden pasar por query params los valores "X" y "Y" para indicar página y total de resultados por página
+http://localhost:9000/users?page="X"&&results_per_page="Y"&&search="Z"
+--> Solicitud de tipo get, entrega todos los usuarios, se pueden pasar por query params los valores "X" y "Y" para indicar página y total de resultados por página; y el valor "Z" para filtrar los resultados
 
 http://localhost:9000/users/delete/:id
 --> Solicitud tipo DELETE, recibe por params el id del usuario a eliminar
 
 http://localhost:9000/users/update/:id
 -> Solicitud tipo PUT, recibe por params el id del usuario a actualizar y por body: { contract_date, name, email, salary, userType }
+
+
+LOS FILTROS Y PAGINADOS FUERON APLICADOS CON SQL PARA EVITAR SATURAR LA APP CON MUCHOS DATOS INNECESARIOS
