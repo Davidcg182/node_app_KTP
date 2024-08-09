@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../../config/database.js";
-import bcrypt from 'bcrypt'
+import bcryptjs from 'bcryptjs'
 
 const empleados = sequelize.define('users', {
     id: {
@@ -38,7 +38,7 @@ const empleados = sequelize.define('users', {
             if (value !== this.password) {
                 throw Error(`password and confirm password must be the same`)
             }
-            const hashPassword = bcrypt.hashSync(value, 10);
+            const hashPassword = bcryptjs.hashSync(value, 10);
             this.setDataValue('password', hashPassword);
         }
     }

@@ -1,6 +1,6 @@
 import users from '../db/models/users.js'
 import jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
+import bcryptjs from 'bcryptjs'
 
 
 /*** ESTAS CONSTANTES DEBO PASARLAS A VARIABLES DE ENTORNO ***/
@@ -71,7 +71,7 @@ const login = async (req, res) => {
 
     const result = await users.findOne({ where: { email: email } });
 
-    if (!result || !(await bcrypt.compare(password, result.password))) {
+    if (!result || !(await bcryptjs.compare(password, result.password))) {
         return res.status(401).json({
             status: 'fail',
             message: 'Incorrect email or password'
