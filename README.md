@@ -11,6 +11,7 @@ PASOS CON DOCKER
 4. LUEGO EJECUTE EL COMANDO "docker run --env-file=./.env -p 9000:9000 node-app:latest"
 
 PASOS SIN DOCKER
+
 3. EJECUTE npm install EN LA CARPETA RAIZ DEL PROYECTO
 4. EJECUTE npm start
 
@@ -50,8 +51,9 @@ http://localhost:9000/auth/login
     }
 
 TOMAR EL TOKEN DE AUTENTICACIÓN DEL LOGIN O DEL SIGNUP
+(TODAS LAS RUTAS SIGUIENTES DEBEN ENTREGAR EL TOKEN DE AUTENTICACIÓN POR HEADERS COMO BEARER TOKEN)
 
-Tickets: (TODAS LAS RUTAS SIGUIENTES DEBEN ENTREGAR EL TOKEN DE AUTENTICACIÓN POR HEADERS COMO BEARER TOKEN)
+Tickets: 
 
 http://localhost:9000/tikects?page="X"&&results_per_page="Y"&&search="Z"
 --> Solicitud de tipo GET, entrega todos los tickets, se pueden pasar por query params los valores "X" y "Y" para indicar página y total de resultados por página; y el valor "Z" para filtrar los resultados
